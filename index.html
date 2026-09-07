@@ -74,23 +74,21 @@
         tg.ready();
         tg.expand();
 
-        // 🚨 CRITICAL INSTRUCTION: Change the 60123456789 placeholder digits below 
-        // to your actual Malaysian personal mobile phone number string right now!
-        // Keep the '60' prefix, and remove any text spaces, dashes, or '+' characters.
-        const SELLER_PHONE = "60123456789"; 
+        // ✅ FIXED: Your real Malaysian mobile phone number is locked in below!
+        const SELLER_PHONE = "601128496698"; 
 
-        // Direct hardware application link engine strategy patch for total iOS and Android compatibility
-        document.getElementById('buy-btn').addEventListener('click', function() {
+        // Universal breakout fix handler using official Telegram SDK navigation links
+        document.getElementById('buy-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
             const message = "Salam boss, I saw your listing for Nasi Lemak on the SPot app. Can we deal?";
+            const universalUrl = "https://wa.me" + SELLER_PHONE + "?text=" + encodeURIComponent(message);
             
-            // Compiles a raw application custom deep scheme protocol configuration parameters string
-            const nativeWhatsappUrl = "whatsapp://send?phone=" + SELLER_PHONE + "&text=" + encodeURIComponent(message);
-            
-            // Passes the routing trigger directly into the Telegram SDK engine breakout method hook
+            // Forces the Telegram parent wrapper to launch WhatsApp natively on your iPhone
             if (tg.openLink) {
-                tg.openLink(nativeWhatsappUrl);
+                tg.openLink(universalUrl);
             } else {
-                window.location.href = nativeWhatsappUrl;
+                window.open(universalUrl, '_blank');
             }
         });
     </script>
