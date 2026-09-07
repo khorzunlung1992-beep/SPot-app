@@ -37,19 +37,18 @@
             margin-bottom: 12px;
             background: #fafafa;
         }
-        /* Style the link anchor exactly like our custom yellow action buttons */
-        .btn-link {
+        button {
             display: block;
             background-color: var(--spot-yellow);
-            color: #000000 !important;
-            text-decoration: none !important;
+            color: #000000;
+            border: none;
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
-            text-align: center;
+            cursor: pointer;
+            width: 100%;
             margin-top: 10px;
-            box-sizing: border-box;
         }
     </style>
 </head>
@@ -67,12 +66,8 @@
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
         <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">0.25 km</span></p>
         
-        <!-- BYPASS FIX: Using a clean standard browser anchor link instead of a JS button click event -->
-        <a href="https://wa.me" 
-           target="_blank" 
-           class="btn-link">
-           Buy via WhatsApp
-        </a>
+        <!-- Action Trigger Button Element -->
+        <button id="buy-btn">Buy via WhatsApp</button>
     </div>
 
     <script>
@@ -80,6 +75,18 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
+
+        // Target Testing Contact String
+        const SELLER_PHONE = "60123456789"; 
+
+        // BYPASS FIX: Intercept button actions using Telegram's Native Open Link Method
+        document.getElementById('buy-btn').onclick = function() {
+            const message = "Salam boss, I saw your listing for Nasi Lemak on the SPot app.";
+            const whatsappUrl = "https://wa.me" + SELLER_PHONE + "?text=" + encodeURIComponent(message);
+            
+            // Force Telegram's framework to request an external redirect breakout handshake safely
+            tg.openLink(whatsappUrl);
+        };
     </script>
 </body>
 </html>
