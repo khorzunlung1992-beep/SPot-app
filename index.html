@@ -6,13 +6,13 @@
     <title>SPot App</title>
     <!-- Official Telegram Mini App SDK -->
     <script src="https://telegram.org"></script>
-    <!-- Tailwind CSS for Quick and Fast Layout Styling -->
+    <!-- Tailwind CSS Script -->
     <script src="https://jsdelivr.net"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color, #f9fafb);
-            color: var(--tg-theme-text-color, #1f2937);
+            background-color: #f9fafb;
+            color: #1f2937;
         }
     </style>
 </head>
@@ -45,9 +45,7 @@
         </div>
 
         <!-- Real-Time Product Directory Feed Container -->
-        <div id="catalogFeed" class="space-y-3">
-            <!-- Items are injected here instantly via Javascript below -->
-        </div>
+        <div id="catalogFeed" class="space-y-3"></div>
     </div>
 
     <!-- PUBLISHING INTERFACE ENGINE (LETAK IKLAN VIEW) -->
@@ -93,29 +91,29 @@
         <button id="btnLetakIklan" onclick="switchTab('viewLetakIklan')" class="flex flex-col items-center text-[11px] font-black text-gray-400">
             <span class="text-xl mb-0.5">➕</span>Letak Iklan
         </button>
-        <button onclick="window.Telegram.WebApp.showAlert('Borak Jiran chat wall features coming soon!')" class="flex flex-col items-center text-[11px] font-black text-gray-400">
+        <button onclick="alert('Borak Jiran chat wall features coming soon!')" class="flex flex-col items-center text-[11px] font-black text-gray-400">
             <span class="text-xl mb-0.5">💬</span>Borak Jiran
         </button>
     </div>
 
-    <!-- LIGHTWEIGHT DRIVER CONTROLLER SCRIPT (NO-DATABASE ENGINE) -->
+    <!-- CONTROL SCRIPT -->
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // Check if Telegram object exists before using it
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand();
+        }
 
-        // Localized Sample Data Storage array to run instantly out of Vercel memory
         const sampleListings = [
             { category: 'makan', title: 'Nasi Lemak Kak Ani Kukus Uthman', price: 3.50, phone: '60123456789', location: 'Petronas Amanjaya' },
             { category: 'makan', title: 'Crispy Burger Ramly Depan Lotus', price: 6.00, phone: '60176543210', location: 'Bakar Arang' },
             { category: 'hasil_tani', title: 'Pisang Awak Segar Kebun Belakang Rumah', price: 5.00, phone: '60198887766', location: 'Taman Puteri Jaya' },
             { category: 'kebun_agro', title: 'Baja Vermicompost Organik Gred A', price: 12.00, phone: '60134445566', location: 'Bandar Utama SP' },
             { category: 'pre_loved', title: 'Kipas Meja Khind 16 Inch (Condition 9/10)', price: 45.00, phone: '60112233445', location: 'Lagenda Height' },
-            { category: 'jasa_jiran', title: 'Runner Mat Motor - Beli Barang Dapur & Keropok', price: 4.00, phone: '60159998887', location: 'Sungai Petani Area' }
+            { category: 'jasa_jiran', title: 'Runner Mat Motor - Beli Barang Dapur', price: 4.00, phone: '60159998887', location: 'Sungai Petani Area' }
         ];
 
         let activeCategoryFilter = null;
 
-        // Visual Tab State Toggle function
         function switchTab(viewId) {
             document.getElementById('viewUtama').className = viewId === 'viewUtama' ? 'block' : 'hidden';
             document.getElementById('viewLetakIklan').className = viewId === 'viewLetakIklan' ? 'block' : 'hidden';
@@ -124,15 +122,14 @@
             document.getElementById('btnLetakIklan').className = viewId === 'viewLetakIklan' ? 'flex flex-col items-center text-[11px] font-black text-black' : 'flex flex-col items-center text-[11px] font-black text-gray-400';
         }
 
-        // Category Filter Management Logic
         function filterCategory(cat) {
             activeCategoryFilter = (activeCategoryFilter === cat) ? null : cat;
             renderFeed();
         }
 
-        // Visual Feed Layout Generation Array Loop
         function renderFeed() {
             const feed = document.getElementById("catalogFeed");
+            if (!feed) return;
             feed.innerHTML = "";
 
             const filteredData = activeCategoryFilter 
@@ -146,10 +143,12 @@
 
             filteredData.forEach(item => {
                 const card = document.createElement("div");
-                card.className = "bg-white p-4 rounded-xl border border-gray-100 shadow-xs relative flex flex-col justify-between";
+                card.className = "bg-white p-4 rounded-xl border border-gray-100 shadow-xs relative flex flex-col justify-between mb-3";
                 
-                const encodedMsg = encodeURIComponent(`Salam boss, saya nampak produk "${item.title}" (RM${item.price.toFixed(2)}) dalam SPot App. Boleh deal kat ${item.location}?`);
-                const waLink = `https://wa.me{item.phone}?text=${encodedMsg}`;
+                const encodedMsg = encodeURIComponent("Salam boss, saya nampak produk \"" + item.title + "\" (RM" + item.price.toFixed(2) + ") dalam SPot App. Boleh deal kat " + item.location + "?");
+                const waLink = "https://wa.me" + item.phone + "?text=" + encodedMsg;
 
-                card.innerHTML = `
-                    <div>
+                card.innerHTML = '\
+                    <div>\
+                        <span class="bg-amber-100 text-amber-800 text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider">' + item.category + '</span>\
+                        <h3 class="font-black text-md mt-1.5 tracking-tight text-gray-900">' + item.title + '</h3>\
