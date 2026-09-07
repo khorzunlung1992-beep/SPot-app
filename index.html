@@ -71,12 +71,12 @@
         // Start the Telegram View Interface Handshake Protocol
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
+        tg.expand(); // Forces full-screen expansion matching native iOS look
 
         // Central target coordinate values for vendor listing origin located in Sungai Petani
         const SELLER_LAT = 5.6434;
         const SELLER_LON = 100.4912;
-        const SELLER_PHONE = "60123456789"; // Replace with your phone number
+        const SELLER_PHONE = "60123456789"; // Swap with your real target number for live testing!
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; // Earth's Radius in km
@@ -96,17 +96,20 @@
             document.getElementById('item-distance').innerText = `${distanceKm.toFixed(2)} km`;
         }
 
-        // Setup dynamic WhatsApp action click link
+        // 🔥 THE IPHONE FIX: Uses Telegram SDK Native Deep Linking Route Control
         document.getElementById('buy-btn').onclick = function() {
             const message = `Salam boss, I saw your listing for *Nasi Lemak Ayam Berempah* (RM6.00) on the SPot app. Can we meet up?`;
-            window.location.href = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
+            const whatsappDeepLink = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
+            
+            // Forces the iPhone to immediately launch the WhatsApp app externally!
+            tg.openLink(whatsappDeepLink);
         };
 
-        // Try to read high-precision satellite data silently in the background
+        // Reads high-precision satellite coordinates silently in the background
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified Safely.");
+                    runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified.");
                 },
                 (error) => {
                     console.log("Using baseline hub parameters.");
