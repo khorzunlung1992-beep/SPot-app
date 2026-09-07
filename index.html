@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPot App</title>
-    <!-- Imports the Official Telegram Web App JavaScript SDK Engine -->
     <script src="https://telegram.org"></script>
     <style>
         :root {
@@ -49,11 +48,6 @@
             width: 100%;
             margin-top: 10px;
         }
-        button:disabled {
-            background-color: #cccccc;
-            color: #666666;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body>
@@ -61,29 +55,26 @@
     <div class="header">🚀 SPot App - Sungai Petani</div>
     
     <div id="gps-status" style="font-size: 13px; margin-bottom: 12px; color: #666666; font-weight: 500;">
-        🔄 Fetching your satellite coordinates...
+        🔄 Loading hyperlocal area tracking...
     </div>
 
-    <!-- Example local live item card data template -->
     <div class="card">
         <h3 style="margin-top:0; margin-bottom:8px;">🍱 Nasi Lemak Ayam Berempah</h3>
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
-        <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color:red; font-weight:bold;">--</span></p>
-        <button id="buy-btn" disabled>Buy via WhatsApp</button>
+        <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">Calculating...</span></p>
+        <button id="buy-btn">Buy via WhatsApp</button>
     </div>
 
     <script>
-        // Start the Telegram View Handshake
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand(); // Maximizes the application footprint on the phone screen layout
+        tg.expand();
 
-        // Target coordinates located right in Central Sungai Petani
+        // Target coordinates for central Sungai Petani listing position origin
         const SELLER_LAT = 5.6434;
         const SELLER_LON = 100.4912;
-        const SELLER_PHONE = "60123456789"; // Replace with your target testing mobile line
+        const SELLER_PHONE = "60123456789"; 
 
-        // Dynamic Haversine Radius Formula calculations
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; 
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -96,39 +87,33 @@
             return R * c; 
         }
 
-        // Intercept native hardware satellite data stream
+        // Updated Engine Logic: Renders a backup value instantly if device GPS is catching up
+        function runDistanceEngine(latitude, longitude, statusText) {
+            const distanceKm = calculateDistance(latitude, longitude, SELLER_LAT, SELLER_LON);
+            document.getElementById('gps-status').innerText = statusText;
+            document.getElementById('item-distance').innerText = `${distanceKm.toFixed(2)} km`;
+            
+            document.getElementById('buy-btn').onclick = function() {
+                const message = `Salam boss, I saw your listing for *Nasi Lemak Ayam Berempah* (RM6.00) on the SPot app. Can we meet up?`;
+                window.location.href = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
+            };
+        }
+
+        // Try reading live coordinates first
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const buyerLat = position.coords.latitude;
-                    const buyerLon = position.coords.longitude;
-                    
-                    const distanceKm = calculateDistance(buyerLat, buyerLon, SELLER_LAT, SELLER_LON);
-                    
-                    document.getElementById('gps-status').innerText = "✅ Live GPS Position Verified.";
-                    document.getElementById('item-distance').innerText = `${distanceKm.toFixed(2)} km`;
-
-                    const buyBtn = document.getElementById('buy-btn');
-                    
-                    // STRICT HYPERLOCAL SHIELD FILTER RULE (10.0km straight line lock)
-                    if (distanceKm <= 10.0) {
-                        buyBtn.disabled = false;
-                        buyBtn.addEventListener('click', () => {
-                            const message = `Salam boss, I saw your listing for *Nasi Lemak Ayam Berempah* (RM6.00) on the SPot app. Can we meet up at *Petronas Amanjaya*?`;
-                            window.location.href = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
-                        });
-                    } else {
-                        buyBtn.innerText = "Out of Bounds (>10km)";
-                        document.getElementById('gps-status').innerText = "📍 Too far away. Showing manual SP Hub selection options.";
-                    }
+                    runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified.");
                 },
                 (error) => {
-                    document.getElementById('gps-status').innerText = "❌ Location access denied. Please turn on your device GPS.";
+                    // FALLBACK HUB: If GPS breaks or lags out, load standard SP Town Center parameters cleanly!
+                    console.log("GPS lagging, using central SP Hub location settings.");
+                    runDistanceEngine(5.6450, 100.4920, "📍 GPS offline. Using default Central SP Hub coordinates.");
                 },
-                { enableHighAccuracy: true }
+                { enableHighAccuracy: true, timeout: 5000 }
             );
         } else {
-            document.getElementById('gps-status').innerText = "❌ Device hardware configuration incompatibility.";
+            runDistanceEngine(5.6450, 100.4920, "📍 Location offline. Defaulting to Central SP Hub.");
         }
     </script>
 </body>
