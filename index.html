@@ -37,17 +37,19 @@
             margin-bottom: 12px;
             background: #fafafa;
         }
-        button {
+        /* Style the link anchor exactly like our custom yellow action buttons */
+        .btn-link {
+            display: block;
             background-color: var(--spot-yellow);
-            color: #000000;
-            border: none;
+            color: #000000 !important;
+            text-decoration: none !important;
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
+            text-align: center;
             margin-top: 10px;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -64,59 +66,20 @@
         <h3 style="margin-top:0; margin-bottom:8px;">🍱 Nasi Lemak Ayam Berempah</h3>
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
         <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">0.25 km</span></p>
-        <button id="buy-btn">Buy via WhatsApp</button>
+        
+        <!-- BYPASS FIX: Using a clean standard browser anchor link instead of a JS button click event -->
+        <a href="https://wa.me" 
+           target="_blank" 
+           class="btn-link">
+           Buy via WhatsApp
+        </a>
     </div>
 
     <script>
         // Start the Telegram View Interface Handshake Protocol
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand(); // Forces full-screen expansion matching native iOS look
-
-        // Central target coordinate values for vendor listing origin located in Sungai Petani
-        const SELLER_LAT = 5.6434;
-        const SELLER_LON = 100.4912;
-        const SELLER_PHONE = "60123456789"; // Swap with your real target number for live testing!
-
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth's Radius in km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        function runDistanceEngine(latitude, longitude, statusText) {
-            const distanceKm = calculateDistance(latitude, longitude, SELLER_LAT, SELLER_LON);
-            document.getElementById('gps-status').innerText = statusText;
-            document.getElementById('item-distance').innerText = `${distanceKm.toFixed(2)} km`;
-        }
-
-        // 🔥 THE IPHONE FIX: Uses Telegram SDK Native Deep Linking Route Control
-        document.getElementById('buy-btn').onclick = function() {
-            const message = `Salam boss, I saw your listing for *Nasi Lemak Ayam Berempah* (RM6.00) on the SPot app. Can we meet up?`;
-            const whatsappDeepLink = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
-            
-            // Forces the iPhone to immediately launch the WhatsApp app externally!
-            tg.openLink(whatsappDeepLink);
-        };
-
-        // Reads high-precision satellite coordinates silently in the background
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified.");
-                },
-                (error) => {
-                    console.log("Using baseline hub parameters.");
-                },
-                { enableHighAccuracy: true, timeout: 2000 }
-            );
-        }
+        tg.expand();
     </script>
 </body>
 </html>
