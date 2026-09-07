@@ -67,32 +67,6 @@
         .view-section.active {
             display: block;
         }
-        /* Out-of-Bounds Fallback Alert Container */
-        .fallback-card {
-            display: none;
-            background: #fdf2f2;
-            border: 1px solid var(--spot-danger);
-            padding: 14px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-        .hub-btn-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .fallback-btn {
-            flex: 1;
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 11px;
-        }
         /* Feed Listings Cards */
         .catalog-feed {
             display: grid;
@@ -174,18 +148,8 @@
             <div class="category-btn" onclick="filterCategory('pre_loved', this)"><span class="category-icon">📦</span>PreLoved</div>
         </div>
 
-        <!-- Out-of-Bounds Fallback Hub Control Shortcut Interface Block -->
-        <div id="fallbackAlert" class="fallback-card">
-            <strong>Kawasan Diluar Had (Out of 10km Radius Bubble Lock)!</strong> [SYSTEM ARCHITECTURE & CORE RULES]<br>
-            You are currently browsing outside Sungai Petani boundaries. Pick your commuting transit route SP Hub down below:
-            <div class="hub-btn-group">
-                <button class="fallback-btn" onclick="overrideHub(5.6447, 100.5218)">Amanjaya Hub</button>
-                <button class="fallback-btn" onclick="overrideHub(5.6025, 100.5050)">Town Center Hub</button>
-            </div>
-        </div>
-
         <!-- Product Listing Grid Container Target Feed Anchor -->
-        <div id="catalog" class="catalog-feed">Checking target neighborhood location coordinates...</div>
+        <div id="catalog" class="catalog-feed">Loading interactive catalog directory...</div>
     </div>
 
     <!-- LETAK IKLAN VENDOR PUBLISHING WORKSPACE VIEW -->
@@ -233,23 +197,52 @@
             tg.expand();
         }
 
-        // Anchor baseline geospatial target center location configurations for Sungai Petani Town
-        const SP_CENTER = { latitude: 5.6447, longitude: 100.5218 };
-        let buyerCoords = null;
         let currentCategoryFilter = 'all';
 
         // Local Memory State Cache Array Mock representation mapping your database structure rules
         let activeListings = [
-            { id: '1', category: 'makan', title: 'Nasi Lemak Kak Ani Kukus', price: 3.50, latitude: 5.6460, longitude: 100.5230 },
-            { id: '2', category: 'makan', title: 'Abang Burn Ramly Burger', price: 6.00, latitude: 5.6410, longitude: 100.5180 },
-            { id: '3', category: 'pre_loved', title: 'Used Office Chair Mesh', price: 45.00, latitude: 5.6590, longitude: 100.5400 },
-            { id: '4', category: 'hasil_tani', title: 'Fresh Morning Market Catch Mackerel', price: 12.00, latitude: 5.6320, longitude: 100.4980 }
+            { id: '1', category: 'makan', title: 'Nasi Lemak Kak Ani Kukus', price: 3.50, distance: 0.4 },
+            { id: '2', category: 'makan', title: 'Abang Burn Ramly Burger', price: 6.00, distance: 1.2 },
+            { id: '3', category: 'pre_loved', title: 'Used Office Chair Mesh', price: 45.00, distance: 3.5 },
+            { id: '4', category: 'hasil_tani', title: 'Fresh Morning Market Catch Mackerel', price: 12.00, distance: 2.1 }
         ];
 
-        // Haversine spatial computation engine function matrix
-        function getHaversineDistance(c1, c2) {
-            const R = 6371; // Earth's Radius scale parameters in Kilometers
-            const dLat = (c2.latitude - c1.latitude) * Math.PI / 180;
-            const dLon = (c2.longitude - c1.longitude) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(c1.latitude * Math.PI / 180) * Math.cos(c2.latitude * Math.PI / 180) *
+        // Dynamic time shifted priority catalog sorting engine
+        function getTimeShiftedPriority(item, currentHour) {
+            if (item.category !== 'makan') return 0;
+            if (currentHour >= 6 && currentHour < 11 && item.title.toLowerCase().includes('nasi lemak')) return 10;
+            if (currentHour >= 16 && item.title.toLowerCase().includes('burger')) return 10;
+            return 1;
+        }
+
+        function renderCatalog() {
+            const catalogEl = document.getElementById('catalog');
+            const currentHour = new Date().getHours();
+            catalogEl.innerHTML = '';
+
+            let targetListings = activeListings.map(item => {
+                const priority = getTimeShiftedPriority(item, currentHour);
+                return { ...item, priority };
+            });
+
+            // Apply active visual sub-category filter criteria
+            if (currentCategoryFilter !== 'all') {
+                targetListings = targetListings.filter(item => item.category === currentCategoryFilter);
+            }
+
+            if (targetListings.length === 0) {
+                catalogEl.innerHTML = '<p style="text-align:center;color:#777;margin-top:20px;">No items found in this category.</p>';
+                return;
+            }
+
+            // High priority custom listing sorting sequence rules
+            targetListings.sort((a, b) => b.priority - a.priority || a.distance - b.distance);
+
+            targetListings.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <h3 style="margin:0 0 6px 0; font-size:16px;">${item.title}</h3>
+                    <p style="margin:0 0 6px 0; font-size:15px;">Price: <strong style="color:#000;">RM${item.price.toFixed(2)}</strong></p>
+                    <p style="font-size:12px; color:#666; margin:0 0 12px 0;">📍 Local Listing • ${item.distance.toFixed(1)} km away</p>
+                    <button style="width:100%; padding:12px; background:var(--spot-green); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer; font-size:14px;"
