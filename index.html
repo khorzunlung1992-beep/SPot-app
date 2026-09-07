@@ -37,19 +37,18 @@
             margin-bottom: 12px;
             background: #fafafa;
         }
-        /* Style the anchor tag to look and act exactly like a native yellow button */
-        .btn-link {
+        button {
             display: block;
             background-color: var(--spot-yellow);
-            color: #000000 !important;
-            text-decoration: none !important;
+            color: #000000;
+            border: none;
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
-            text-align: center;
+            cursor: pointer;
+            width: 100%;
             margin-top: 10px;
-            box-sizing: border-box;
         }
     </style>
 </head>
@@ -66,13 +65,7 @@
         <h3 style="margin-top:0; margin-bottom:8px;">🍱 Nasi Lemak Ayam Berempah</h3>
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
         <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">0.25 km</span></p>
-        
-        <!-- PURE LINK BYPASS: Strict global format with no spaces or bracket characters to pass iOS filter layers -->
-        <a href="https://wa.me" 
-           class="btn-link" 
-           id="buy-btn">
-           Buy via WhatsApp
-        </a>
+        <button id="buy-btn">Buy via WhatsApp</button>
     </div>
 
     <script>
@@ -81,16 +74,28 @@
         tg.ready();
         tg.expand();
 
-        // Safe external app router for strict mobile app handoffs
-        document.getElementById('buy-btn').addEventListener('click', function(e) {
-            // We DO NOT stop the default link action (e.preventDefault removed)
-            const targetUrl = this.getAttribute('href');
+        // Target Contact Information
+        const SELLER_PHONE = "60123456789"; 
+
+        // BYPASS FIX: Using a clean, native Telegram UI alert popup window block interface
+        document.getElementById('buy-btn').addEventListener('click', function() {
+            const message = "Salam boss, I saw your listing for Nasi Lemak on the SPot app.";
+            const whatsappUrl = "https://wa.me" + SELLER_PHONE + "?text=" + encodeURIComponent(message);
             
-            // Check if running inside the official Telegram library wrapper
-            if (tg.openLink) {
-                e.preventDefault();
-                tg.openLink(targetUrl);
-            }
+            // This forces Telegram to use its official system popup alert box configuration layout
+            tg.showPopup({
+                title: 'Buka WhatsApp',
+                message: 'Anda akan keluar dari Telegram untuk menghantar mesej kepada penjual.',
+                buttons: [
+                    {id: 'open', type: 'default', text: 'Teruskan'},
+                    {id: 'cancel', type: 'cancel', text: 'Batal'}
+                ]
+            }, function(buttonId) {
+                // Safely routes only after the user actively confirms the intent inside the native layer
+                if (buttonId === 'open') {
+                    tg.openLink(whatsappUrl, {try_instant_view: false});
+                }
+            });
         });
     </script>
 </body>
