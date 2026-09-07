@@ -37,7 +37,7 @@
             margin-bottom: 12px;
             background: #fafafa;
         }
-        /* Style the anchor tag to look and act exactly like a native button component */
+        /* Style the anchor tag component to look and act exactly like a native button click zone */
         .btn-link {
             display: block;
             background-color: var(--spot-yellow);
@@ -67,8 +67,8 @@
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
         <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">0.25 km</span></p>
         
-        <!-- PURE LINK BYPASS: Bypasses JavaScript blocks by using a direct HTML deep link protocol -->
-        <a href="https://whatsapp.com" 
+        <!-- PURE LINK BYPASS: Uses a perfectly cleaned wa.me link configuration with zero browser encoding bugs -->
+        <a href="https://wa.me" 
            class="btn-link" 
            id="buy-btn">
            Buy via WhatsApp
@@ -81,10 +81,12 @@
         tg.ready();
         tg.expand();
 
-        // Native overlay handler to ensure Telegram handles the link click cleanly inside iOS
+        // Standard link execution wrapper patch tailored to seamlessly handle app breakouts across iOS and Android
         document.getElementById('buy-btn').addEventListener('click', function(e) {
             e.preventDefault();
             const targetUrl = this.getAttribute('href');
+            
+            // Fires Telegram's native app layout expansion router to force open the external chat app natively
             tg.openLink(targetUrl);
         });
     </script>
