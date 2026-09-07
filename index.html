@@ -56,14 +56,14 @@
     <div class="header">🚀 SPot App - Sungai Petani</div>
     
     <div id="gps-status" style="font-size: 13px; margin-bottom: 12px; color: #666666; font-weight: 500;">
-        📍 Synchronizing local regional hub tracking...
+        📍 Connected to Central SP Hub.
     </div>
 
     <!-- Live Vendor Product Listing Card Item Template Layout -->
     <div class="card">
         <h3 style="margin-top:0; margin-bottom:8px;">🍱 Nasi Lemak Ayam Berempah</h3>
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
-        <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">Calculating distance...</span></p>
+        <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">0.25 km</span></p>
         <button id="buy-btn">Buy via WhatsApp</button>
     </div>
 
@@ -71,16 +71,15 @@
         // Start the Telegram View Interface Handshake Protocol
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand(); // Maximizes the application wrapper footprint on your device layout screen
+        tg.expand();
 
         // Central target coordinate values for vendor listing origin located in Sungai Petani
         const SELLER_LAT = 5.6434;
         const SELLER_LON = 100.4912;
-        const SELLER_PHONE = "60123456789"; // Replace with your target testing mobile line phone number
+        const SELLER_PHONE = "60123456789"; // Replace with your phone number
 
-        // Dynamic Haversine Geolocation Spherical Distance Formula calculations
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth's Radius value in kilometers
+            const R = 6371; // Earth's Radius in km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = 
@@ -88,35 +87,31 @@
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
                 Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; // Distance calculated outcome string in kilometers
+            return R * c;
         }
 
-        // Operational Engine Handler: Outputs immediate metrics to UI to eliminate raw calculating delays
         function runDistanceEngine(latitude, longitude, statusText) {
             const distanceKm = calculateDistance(latitude, longitude, SELLER_LAT, SELLER_LON);
             document.getElementById('gps-status').innerText = statusText;
             document.getElementById('item-distance').innerText = `${distanceKm.toFixed(2)} km`;
-            
-            document.getElementById('buy-btn').onclick = function() {
-                const message = `Salam boss, I saw your listing for *Nasi Lemak Ayam Berempah* (RM6.00) on the SPot app. Can we meet up?`;
-                window.location.href = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
-            };
         }
 
-        // 1. INSTANTLY execute standard central SP Town Center coordinates baseline mapping parameters 
-        runDistanceEngine(5.6450, 100.4920, "📍 Defaulting to Central SP Hub coordinates baseline.");
+        // Setup dynamic WhatsApp action click link
+        document.getElementById('buy-btn').onclick = function() {
+            const message = `Salam boss, I saw your listing for *Nasi Lemak Ayam Berempah* (RM6.00) on the SPot app. Can we meet up?`;
+            window.location.href = `https://wa.me{SELLER_PHONE}?text=${encodeURIComponent(message)}`;
+        };
 
-        // 2. Safely capture real high-precision phone satellite data streams quietly in the background background
+        // Try to read high-precision satellite data silently in the background
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    // Overrides baseline metrics smoothly if user approves phone settings options access
                     runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified Safely.");
                 },
                 (error) => {
-                    console.log("Device GPS handshake skipped or cached. Remaining on baseline SP parameters.");
+                    console.log("Using baseline hub parameters.");
                 },
-                { enableHighAccuracy: true, timeout: 3000 }
+                { enableHighAccuracy: true, timeout: 2000 }
             );
         }
     </script>
