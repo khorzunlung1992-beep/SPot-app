@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPot App</title>
+    <!-- Imports the Official Telegram Web App JavaScript SDK Engine -->
+    <script src="https://telegram.org"></script>
     <style>
         :root {
             --tg-theme-bg-color: #ffffff;
@@ -35,19 +37,18 @@
             margin-bottom: 12px;
             background: #fafafa;
         }
-        /* Style the anchor tag to look and act exactly like a native yellow button */
-        .btn-link {
+        button {
             display: block;
             background-color: var(--spot-yellow);
-            color: #000000 !important;
-            text-decoration: none !important;
+            color: #000000;
+            border: none;
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
-            text-align: center;
+            cursor: pointer;
+            width: 100%;
             margin-top: 10px;
-            box-sizing: border-box;
         }
     </style>
 </head>
@@ -64,14 +65,32 @@
         <h3 style="margin-top:0; margin-bottom:8px;">🍱 Nasi Lemak Ayam Berempah</h3>
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
         <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">0.25 km</span></p>
-        
-        <!-- ✅ PURE LINK FIX: Your real number is pre-filled using strict global formatting! No complex JS blocks to break on iOS. -->
-        <a href="https://wa.me" 
-           class="btn-link"
-           target="_blank">
-           Buy via WhatsApp
-        </a>
+        <button id="buy-btn">Buy via WhatsApp</button>
     </div>
 
+    <script>
+        // Start the Telegram View Interface Handshake Protocol
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // 🎯 FIXED: Removed the extra duplicate number typo digit! Total 12 digits now.
+        const SELLER_PHONE = "601128496698"; 
+
+        // Secure, cross-platform external link handler using native library hooks
+        document.getElementById('buy-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const message = "Salam boss, I saw your listing for Nasi Lemak on the SPot app. Can we deal?";
+            const universalUrl = "https://wa.me/" + SELLER_PHONE + "?text=" + encodeURIComponent(message);
+            
+            // Forces the parent Telegram shell to cleanly open the chat natively on your phone
+            if (tg.openLink) {
+                tg.openLink(universalUrl);
+            } else {
+                window.open(universalUrl, '_blank');
+            }
+        });
+    </script>
 </body>
 </html>
