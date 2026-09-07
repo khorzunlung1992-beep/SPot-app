@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPot App</title>
+    <!-- Imports the Official Telegram Web App JavaScript SDK Engine -->
     <script src="https://telegram.org"></script>
     <style>
         :root {
@@ -55,28 +56,31 @@
     <div class="header">🚀 SPot App - Sungai Petani</div>
     
     <div id="gps-status" style="font-size: 13px; margin-bottom: 12px; color: #666666; font-weight: 500;">
-        🔄 Loading hyperlocal area tracking...
+        📍 Synchronizing local regional hub tracking...
     </div>
 
+    <!-- Live Vendor Product Listing Card Item Template Layout -->
     <div class="card">
         <h3 style="margin-top:0; margin-bottom:8px;">🍱 Nasi Lemak Ayam Berempah</h3>
         <p style="margin: 4px 0;"><strong>Price:</strong> RM6.00</p>
-        <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">Calculating...</span></p>
+        <p style="margin: 4px 0;"><strong>Distance:</strong> <span id="item-distance" style="color: green; font-weight:bold;">Calculating distance...</span></p>
         <button id="buy-btn">Buy via WhatsApp</button>
     </div>
 
     <script>
+        // Start the Telegram View Interface Handshake Protocol
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
+        tg.expand(); // Maximizes the application wrapper footprint on your device layout screen
 
-        // Target coordinates for central Sungai Petani listing position origin
+        // Central target coordinate values for vendor listing origin located in Sungai Petani
         const SELLER_LAT = 5.6434;
         const SELLER_LON = 100.4912;
-        const SELLER_PHONE = "60123456789"; 
+        const SELLER_PHONE = "60123456789"; // Replace with your target testing mobile line phone number
 
+        // Dynamic Haversine Geolocation Spherical Distance Formula calculations
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
+            const R = 6371; // Earth's Radius value in kilometers
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = 
@@ -84,10 +88,10 @@
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
                 Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; 
+            return R * c; // Distance calculated outcome string in kilometers
         }
 
-        // Updated Engine Logic: Renders a backup value instantly if device GPS is catching up
+        // Operational Engine Handler: Outputs immediate metrics to UI to eliminate raw calculating delays
         function runDistanceEngine(latitude, longitude, statusText) {
             const distanceKm = calculateDistance(latitude, longitude, SELLER_LAT, SELLER_LON);
             document.getElementById('gps-status').innerText = statusText;
@@ -99,21 +103,21 @@
             };
         }
 
-        // Try reading live coordinates first
+        // 1. INSTANTLY execute standard central SP Town Center coordinates baseline mapping parameters 
+        runDistanceEngine(5.6450, 100.4920, "📍 Defaulting to Central SP Hub coordinates baseline.");
+
+        // 2. Safely capture real high-precision phone satellite data streams quietly in the background background
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified.");
+                    // Overrides baseline metrics smoothly if user approves phone settings options access
+                    runDistanceEngine(position.coords.latitude, position.coords.longitude, "✅ Live GPS Position Verified Safely.");
                 },
                 (error) => {
-                    // FALLBACK HUB: If GPS breaks or lags out, load standard SP Town Center parameters cleanly!
-                    console.log("GPS lagging, using central SP Hub location settings.");
-                    runDistanceEngine(5.6450, 100.4920, "📍 GPS offline. Using default Central SP Hub coordinates.");
+                    console.log("Device GPS handshake skipped or cached. Remaining on baseline SP parameters.");
                 },
-                { enableHighAccuracy: true, timeout: 5000 }
+                { enableHighAccuracy: true, timeout: 3000 }
             );
-        } else {
-            runDistanceEngine(5.6450, 100.4920, "📍 Location offline. Defaulting to Central SP Hub.");
         }
     </script>
 </body>
